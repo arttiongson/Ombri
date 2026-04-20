@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ArtFinance — Design Explorations</title>
+  <meta name="description" content="Time-of-day and weather-aware home screen explorations for ArtFinance." />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #F0EEE9;
+      color: #28201A;
+      font-family: "Plus Jakarta Sans", -apple-system, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    iframe {
+      display: block;
+      width: 100%;
+      border: 0;
+      background: #F0EEE9;
+    }
+    /* Subtle divider between the two explorations */
+    .divider {
+      height: 1px;
+      background: rgba(40, 32, 26, 0.08);
+      margin: 0 auto;
+      max-width: 1400px;
+    }
+  </style>
+</head>
+<body>
+  <iframe id="f1" src="home-redesign.html" title="Home redesign — time of day" scrolling="no"></iframe>
+  <div class="divider"></div>
+  <iframe id="f2" src="home-weather.html" title="Home redesign — weather" scrolling="no"></iframe>
+
+  <script>
+    // Auto-size each iframe to its content so the page scrolls as one continuous canvas.
+    function resize(f) {
+      try {
+        const doc = f.contentDocument || f.contentWindow.document;
+        const h = Math.max(
+          doc.documentElement.scrollHeight,
+          doc.body ? doc.body.scrollHeight : 0
+        );
+        f.style.height = h + 'px';
+      } catch (e) { /* cross-origin — shouldn't happen for same-origin files */ }
+    }
+
+    document.querySelectorAll('iframe').forEach((f) => {
+      f.addEventListener('load', () => {
+        resize(f);
+        // Re-measure after webfonts settle + any late layout shifts.
+        [200, 600, 1400, 3000].forEach((t) => setTimeout(() => resize(f), t));
+
+        try {
+          const doc = f.contentDocument;
+          new ResizeObserver(() => resize(f)).observe(doc.documentElement);
+          // Also watch DOM mutations (the mockup cycles through time-of-day states).
+          new MutationObserver(() => resize(f)).observe(doc.documentElement, {
+            subtree: true, childList: true, attributes: true,
+          });
+        } catch (e) {}
+      });
+    });
+
+    // Re-measure on viewport resize.
+    window.addEventListener('resize', () => {
+      document.querySelectorAll('iframe').forEach(resize);
+    });
+  </script>
+</body>
+</html>
