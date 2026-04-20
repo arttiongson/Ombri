@@ -116,6 +116,30 @@
       display: flex; align-items: center; justify-content: center;
       position: relative;
     }
+    /* Moon halo — a separate circular gradient behind the orb so the glow
+       reads as a clean ring even though the moon itself is a crescent
+       (drop-shadow on a masked element follows the crescent outline instead
+       of the implied full-disc). Visible only at night. */
+    .moon-halo {
+      position: absolute;
+      width: clamp(300px, 34vw, 440px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle,
+        rgba(225, 235, 255, 0.30) 0%,
+        rgba(200, 220, 245, 0.18) 22%,
+        rgba(180, 200, 235, 0.08) 45%,
+        rgba(180, 200, 235, 0.03) 65%,
+        transparent 80%);
+      opacity: 0;
+      transition: opacity 600ms ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+    body.period-night .moon-halo { opacity: calc(1 - var(--fade, 0)); }
+
     /* Horizon line below the half-sun at sunset. Extends well beyond the
        right panel so it reads as a true horizon, not a decorative underline. */
     .horizon {
@@ -196,19 +220,27 @@
     }
     /* Sunset: half-sun sitting on the horizon.
        Using mask-image (not clip-path) so the circular border-radius still
-       defines the visible shape — clip-path would clip to a rectangle. */
+       defines the visible shape — clip-path would clip to a rectangle.
+       Also flatten the fill — the default orb uses an offset highlight that
+       reads as a 3D ball; the sun should be flat and glowing instead. */
     body.period-sunset .orb {
       -webkit-mask-image: linear-gradient(to bottom, #000 50%, transparent 50.1%);
               mask-image: linear-gradient(to bottom, #000 50%, transparent 50.1%);
+      background: radial-gradient(circle at 50% 50%,
+        var(--orb-from) 0%,
+        var(--orb-to) 70%,
+        color-mix(in srgb, var(--orb-to) 50%, transparent) 92%,
+        transparent 100%);
+      filter:
+        drop-shadow(0 0 24px color-mix(in srgb, var(--orb-glow) 70%, transparent))
+        drop-shadow(0 0 12px var(--orb-glow));
     }
-    /* Night: crescent moon with a luminous multi-stop halo. */
+    /* Night: crescent moon. Halo is handled by the separate .moon-halo
+       element; drop-shadow here just brightens the crescent edges. */
     body.period-night .orb {
       -webkit-mask: radial-gradient(circle at 28% 50%, transparent 45%, black 46%);
               mask: radial-gradient(circle at 28% 50%, transparent 45%, black 46%);
-      filter:
-        drop-shadow(0 0  18px rgba(230, 240, 255, 0.65))
-        drop-shadow(0 0  48px rgba(200, 220, 245, 0.45))
-        drop-shadow(0 0 100px rgba(180, 200, 235, 0.30));
+      filter: drop-shadow(0 0 8px rgba(230, 240, 255, 0.35));
     }
 
     /* Starfield — positioned behind text + divider, above the sky gradient.
@@ -401,6 +433,7 @@
       <div class="hero-divider" aria-hidden="true"></div>
       <div class="hero-right">
         <div class="horizon" aria-hidden="true"></div>
+        <div class="moon-halo" aria-hidden="true"></div>
         <div class="orb" id="orb" aria-hidden="true"></div>
       </div>
     </div>
