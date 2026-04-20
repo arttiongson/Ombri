@@ -8,12 +8,18 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  html, body { margin: 0; padding: 0; background: #F0EEE9; }
+  html, body { margin: 0; padding: 0; background: #F0EEE9; overflow-x: hidden; }
   body {
     font-family: "Plus Jakarta Sans", -apple-system, system-ui, sans-serif;
     color: #28201A;
-    min-height: 100vh;
   }
+  /* Scale the whole page down on viewports narrower than the phone frame (~440px).
+     Phone mockup is a fixed 390px; without this it clips on the right.
+     `zoom` shrinks both visual size AND layout space, unlike transform: scale. */
+  @media (max-width: 440px) { body { zoom: 0.90; } }
+  @media (max-width: 410px) { body { zoom: 0.82; } }
+  @media (max-width: 380px) { body { zoom: 0.74; } }
+  @media (max-width: 350px) { body { zoom: 0.66; } }
   .canvas-wrap {
     padding: 48px 40px 80px;
     max-width: 1300px;
