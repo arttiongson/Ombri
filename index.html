@@ -79,7 +79,21 @@
       justify-content: center;
       position: relative;
       background: transparent;
+      overflow: hidden; /* clip the sky gradient and horizon to hero bounds */
     }
+    /* Sunset sky gradient overlay — only visible when period-sunset is active.
+       Fades out along with the rest of the dark sky as you scroll. */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--hero-gradient, transparent);
+      opacity: calc(1 - var(--fade, 0));
+      pointer-events: none;
+      z-index: 0;
+      transition: background 500ms ease;
+    }
+    .hero-inner, .scroll-hint { position: relative; z-index: 1; }
     .hero-inner {
       width: 100%;
       max-width: 1500px;
@@ -100,7 +114,26 @@
     .hero-right  {
       flex: 0 0 320px;
       display: flex; align-items: center; justify-content: center;
+      position: relative;
     }
+    /* Horizon line below the half-sun at sunset. Extends well beyond the
+       right panel so it reads as a true horizon, not a decorative underline. */
+    .horizon {
+      position: absolute;
+      left: -50vw;
+      right: -2vw;
+      top: 50%;
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        color-mix(in srgb, var(--orb-to) 55%, transparent) 55%,
+        color-mix(in srgb, var(--orb-to) 35%, transparent) 85%,
+        transparent 100%);
+      opacity: 0;
+      transition: opacity 500ms ease;
+      pointer-events: none;
+    }
+    body.period-sunset .horizon { opacity: 1; }
     .wordmark {
       font-size: clamp(84px, 18vw, 220px);
       font-weight: 800; font-style: italic;
@@ -151,12 +184,27 @@
       border-radius: 50%;
       background: radial-gradient(circle at 32% 32%,
         var(--orb-from) 0%,
-        var(--orb-to) 62%,
-        rgba(0,0,0,0) 98%);
+        var(--orb-to) 55%,
+        var(--orb-rim, rgba(0,0,0,0)) 88%,
+        transparent 100%);
       filter: drop-shadow(0 0 60px var(--orb-glow))
               drop-shadow(0 0 20px var(--orb-glow));
       animation: breathe 6s ease-in-out infinite;
-      transition: background 500ms ease, filter 500ms ease;
+      transition: background 500ms ease, filter 500ms ease, -webkit-mask 500ms ease, mask 500ms ease, clip-path 500ms ease;
+      position: relative;
+      z-index: 2;
+    }
+    /* Sunset: half-sun. The bottom half is "below the horizon". */
+    body.period-sunset .orb {
+      clip-path: inset(0 0 50% 0);
+    }
+    /* Night: crescent moon. Mask-out a circle offset to the left, leaving
+       a crescent arc on the right side of the disc. */
+    body.period-night .orb {
+      -webkit-mask: radial-gradient(circle at 28% 50%, transparent 45%, black 46%);
+              mask: radial-gradient(circle at 28% 50%, transparent 45%, black 46%);
+      filter: drop-shadow(0 0 48px var(--orb-glow))
+              drop-shadow(0 0 18px var(--orb-glow));
     }
     @keyframes breathe {
       0%, 100% { transform: scale(1);    opacity: 0.96; }
@@ -324,6 +372,7 @@
       </div>
       <div class="hero-divider" aria-hidden="true"></div>
       <div class="hero-right">
+        <div class="horizon" aria-hidden="true"></div>
         <div class="orb" id="orb" aria-hidden="true"></div>
       </div>
     </div>
@@ -375,23 +424,44 @@
     const palettes = {
       morning: {
         bg:'#0B1410', text:'#F2EFE6', soft:'#B8A88F', mute:'#776852',
-        orbFrom:'#FFE4B5', orbTo:'#FFB347', orbGlow:'rgba(255, 180, 90, 0.45)',
-        hairline:'rgba(242, 239, 230, 0.14)', label:'Morning',
+        orbFrom:'#FFE4B5', orbTo:'#FFB347', orbRim:'transparent',
+        orbGlow:'rgba(255, 180, 90, 0.45)',
+        hairline:'rgba(242, 239, 230, 0.14)',
+        gradient:'transparent',
+        label:'Morning',
       },
       afternoon: {
         bg:'#080E0A', text:'#E4F0E8', soft:'#80A890', mute:'#4A7058',
-        orbFrom:'#FFF8DC', orbTo:'#FFD166', orbGlow:'rgba(255, 209, 102, 0.40)',
-        hairline:'rgba(228, 240, 232, 0.14)', label:'Afternoon',
+        orbFrom:'#FFF8DC', orbTo:'#FFD166', orbRim:'transparent',
+        orbGlow:'rgba(255, 209, 102, 0.40)',
+        hairline:'rgba(228, 240, 232, 0.14)',
+        gradient:'transparent',
+        label:'Afternoon',
       },
+      /* Sunset: purple-blue sky gradient, warm-to-magenta half-sun with
+         horizon line. Orb colors layer cream → orange → pink → deep magenta. */
       sunset: {
-        bg:'#180A08', text:'#F8E8E0', soft:'#C29A88', mute:'#7A5045',
-        orbFrom:'#FFB088', orbTo:'#FF5632', orbGlow:'rgba(255, 86, 50, 0.48)',
-        hairline:'rgba(248, 232, 224, 0.16)', label:'Sunset',
+        bg:'#1B1028', text:'#F8E4DA', soft:'#D6A498', mute:'#8C5C60',
+        orbFrom:'#FFE4B0', orbTo:'#F26B3F', orbRim:'#7A1E4A',
+        orbGlow:'rgba(240, 90, 80, 0.55)',
+        hairline:'rgba(248, 228, 218, 0.18)',
+        gradient:
+          'linear-gradient(180deg,' +
+          'rgba(20, 10, 44, 0.85) 0%,'   +   /* deep night sky at top */
+          'rgba(56, 22, 96, 0.80) 22%,'  +   /* indigo */
+          'rgba(116, 40, 124, 0.75) 42%,'+   /* purple */
+          'rgba(196, 64, 118, 0.70) 60%,'+   /* pink-magenta */
+          'rgba(240, 120, 82, 0.55) 76%,'+   /* warm orange */
+          'rgba(28, 14, 40, 0.70) 100%)',    /* fade dark below horizon */
+        label:'Sunset',
       },
       night: {
         bg:'#060A14', text:'#E8EEF8', soft:'#8090B0', mute:'#4A5878',
-        orbFrom:'#F4F6FC', orbTo:'#C8D0E4', orbGlow:'rgba(200, 208, 228, 0.45)',
-        hairline:'rgba(232, 238, 248, 0.14)', label:'Night',
+        orbFrom:'#F4F6FC', orbTo:'#C8D0E4', orbRim:'#7A88AA',
+        orbGlow:'rgba(180, 195, 228, 0.40)',
+        hairline:'rgba(232, 238, 248, 0.14)',
+        gradient:'transparent',
+        label:'Night',
       },
     };
 
@@ -411,8 +481,14 @@
       r.style.setProperty('--sky-text-mute', p.mute);
       r.style.setProperty('--orb-from',      p.orbFrom);
       r.style.setProperty('--orb-to',        p.orbTo);
+      r.style.setProperty('--orb-rim',       p.orbRim || 'transparent');
       r.style.setProperty('--orb-glow',      p.orbGlow);
       r.style.setProperty('--hairline',      p.hairline);
+      r.style.setProperty('--hero-gradient', p.gradient || 'transparent');
+
+      // Body class for period-specific styles (half-sun, crescent, horizon)
+      document.body.classList.remove('period-morning', 'period-afternoon', 'period-sunset', 'period-night');
+      document.body.classList.add('period-' + period);
 
       let place = '';
       try {
