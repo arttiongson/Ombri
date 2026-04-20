@@ -198,13 +198,37 @@
     body.period-sunset .orb {
       clip-path: inset(0 0 50% 0);
     }
-    /* Night: crescent moon. Mask-out a circle offset to the left, leaving
-       a crescent arc on the right side of the disc. */
+    /* Night: crescent moon with a luminous multi-stop halo. */
     body.period-night .orb {
       -webkit-mask: radial-gradient(circle at 28% 50%, transparent 45%, black 46%);
               mask: radial-gradient(circle at 28% 50%, transparent 45%, black 46%);
-      filter: drop-shadow(0 0 48px var(--orb-glow))
-              drop-shadow(0 0 18px var(--orb-glow));
+      filter:
+        drop-shadow(0 0  18px rgba(230, 240, 255, 0.65))
+        drop-shadow(0 0  48px rgba(200, 220, 245, 0.45))
+        drop-shadow(0 0 100px rgba(180, 200, 235, 0.30));
+    }
+
+    /* Starfield — positioned behind text + divider, above the sky gradient.
+       Populated via JS on init. Visible only at night, fades with scroll. */
+    .stars {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 600ms ease;
+    }
+    body.period-night .stars { opacity: calc(1 - var(--fade, 0)); }
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: #F4F8FF;
+      animation: twinkle var(--dur, 3.6s) ease-in-out infinite alternate;
+      animation-delay: var(--delay, 0s);
+    }
+    @keyframes twinkle {
+      from { opacity: var(--min-op, 0.25); transform: scale(0.92); }
+      to   { opacity: var(--max-op, 0.9);  transform: scale(1);    }
     }
     @keyframes breathe {
       0%, 100% { transform: scale(1);    opacity: 0.96; }
@@ -360,6 +384,7 @@
 
   <!-- ========== SNAP 1: HERO ========== -->
   <section class="hero snap">
+    <div class="stars" id="stars" aria-hidden="true"></div>
     <div class="hero-inner">
       <div class="hero-left">
         <h1 class="wordmark">Ombri</h1>
@@ -422,20 +447,43 @@
     // Time-of-day palette — mirrors mockup's internal palette
     // =============================================================
     const palettes = {
+      /* Morning: warm dawn sky with a golden halo glowing out from the sun.
+         Double radial gradient: tight amber ring near the sun, broader warm
+         wash across the lower half. */
       morning: {
-        bg:'#0B1410', text:'#F2EFE6', soft:'#B8A88F', mute:'#776852',
+        bg:'#120A06', text:'#F2EFE6', soft:'#B8A88F', mute:'#776852',
         orbFrom:'#FFE4B5', orbTo:'#FFB347', orbRim:'transparent',
-        orbGlow:'rgba(255, 180, 90, 0.45)',
-        hairline:'rgba(242, 239, 230, 0.14)',
-        gradient:'transparent',
+        orbGlow:'rgba(255, 180, 90, 0.55)',
+        hairline:'rgba(242, 239, 230, 0.16)',
+        gradient:
+          'radial-gradient(ellipse 900px 700px at 85% 50%,' +
+            'rgba(255, 190, 110, 0.42) 0%,' +
+            'rgba(255, 160, 70, 0.22) 35%,'  +
+            'transparent 65%),' +
+          'linear-gradient(180deg,' +
+            'rgba(40, 24, 12, 0.55) 0%,'  +
+            'rgba(90, 50, 22, 0.38) 45%,' +
+            'rgba(200, 130, 60, 0.25) 85%,' +
+            'rgba(30, 18, 8, 0.55) 100%)',
         label:'Morning',
       },
+      /* Afternoon: deep sky blue (readable with cream text). Softer
+         highlight glow around the sun, atmospheric gradient from deep-blue
+         at top to a warmer horizon below. */
       afternoon: {
-        bg:'#080E0A', text:'#E4F0E8', soft:'#80A890', mute:'#4A7058',
+        bg:'#0D1D32', text:'#E8F0FA', soft:'#7C9ABE', mute:'#4A6688',
         orbFrom:'#FFF8DC', orbTo:'#FFD166', orbRim:'transparent',
-        orbGlow:'rgba(255, 209, 102, 0.40)',
-        hairline:'rgba(228, 240, 232, 0.14)',
-        gradient:'transparent',
+        orbGlow:'rgba(255, 220, 140, 0.45)',
+        hairline:'rgba(232, 240, 250, 0.16)',
+        gradient:
+          'radial-gradient(ellipse 800px 600px at 85% 50%,' +
+            'rgba(255, 230, 150, 0.22) 0%,' +
+            'transparent 60%),' +
+          'linear-gradient(180deg,' +
+            'rgba(14, 36, 72, 0.70) 0%,'   +
+            'rgba(30, 68, 120, 0.55) 35%,' +
+            'rgba(70, 120, 180, 0.40) 70%,' +
+            'rgba(180, 180, 200, 0.28) 100%)',
         label:'Afternoon',
       },
       /* Sunset: purple-blue sky gradient, warm-to-magenta half-sun with
@@ -511,6 +559,32 @@
       if (override && palettes[override]) return override;
       return periodForHour(new Date().getHours());
     }
+
+    // Generate starfield once on load (visible only when night)
+    (function populateStars() {
+      const starsEl = document.getElementById('stars');
+      if (!starsEl) return;
+      const count = 90;
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < count; i++) {
+        const s = document.createElement('div');
+        s.className = 'star';
+        const x      = Math.random() * 100;
+        const y      = Math.random() * 100;
+        const size   = +(Math.random() * 1.8 + 0.7).toFixed(2);
+        const minOp  = +(Math.random() * 0.25 + 0.15).toFixed(2);
+        const maxOp  = +(Math.random() * 0.45 + 0.55).toFixed(2);
+        const dur    = +(Math.random() * 3 + 2.2).toFixed(2);
+        const delay  = +(Math.random() * 4).toFixed(2);
+        s.style.cssText =
+          `left:${x}%;top:${y}%;` +
+          `width:${size}px;height:${size}px;` +
+          `--min-op:${minOp};--max-op:${maxOp};` +
+          `--dur:${dur}s;--delay:-${delay}s;`;
+        frag.appendChild(s);
+      }
+      starsEl.appendChild(frag);
+    })();
 
     applyPeriod(getCurrentPeriod());
 
