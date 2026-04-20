@@ -3,12 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ombri — Design Explorations</title>
-  <meta name="description" content="Time-of-day and weather-aware home screen explorations for Ombri — an iOS finance app." />
-  <meta property="og:title" content="Ombri — Design Explorations" />
-  <meta property="og:description" content="A finance app that knows the hour and reads the sky." />
+  <title>Ombri — Finance by the hour.</title>
+  <meta name="description" content="Ombri is a finance app that takes on the color of the hour and the weather outside your window." />
+  <meta property="og:title" content="Ombri — Finance by the hour." />
+  <meta property="og:description" content="A finance app that takes on the color of the hour and the weather outside your window." />
   <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
+
   <style>
+    *, *::before, *::after { box-sizing: border-box; }
     html, body {
       margin: 0;
       padding: 0;
@@ -17,29 +23,293 @@
       font-family: "Plus Jakarta Sans", -apple-system, system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      scroll-behavior: smooth;
     }
+
+    /* === HERO ============================================= */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      padding: 56px 56px 120px;
+      max-width: 1500px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;   /* wordmark grounded toward bottom */
+    }
+    .hero-sky {
+      position: absolute;
+      top: 56px;
+      right: 56px;
+      width: 140px;
+      height: 140px;
+      pointer-events: none;
+    }
+    .orb {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 32% 32%,
+        var(--orb-highlight) 0%,
+        var(--orb-core) 50%,
+        var(--orb-edge) 88%);
+      box-shadow:
+        0 0 80px 0 var(--orb-glow),
+        0 0 32px 0 var(--orb-glow),
+        0 0 0 1px rgba(40, 32, 26, 0.03);
+      animation: breathe 6s ease-in-out infinite;
+    }
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); opacity: 0.95; }
+      50%      { transform: scale(1.05); opacity: 1; }
+    }
+
+    .wordmark {
+      font-weight: 800;
+      font-style: italic;
+      font-size: clamp(84px, 20vw, 240px);
+      line-height: 0.88;
+      letter-spacing: -0.045em;
+      color: #1F1A14;
+      margin: 0;
+    }
+    .headline {
+      font-size: clamp(30px, 4.2vw, 52px);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      color: #1F1A14;
+      margin: 40px 0 8px;
+      max-width: 900px;
+    }
+    .time-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #8C7B62;
+      text-transform: uppercase;
+      margin: 20px 0 0;
+    }
+    .ctas {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+    .cta-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #1F1A14;
+      color: #F0EEE9;
+      padding: 14px 26px;
+      border-radius: 999px;
+      border: 0;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.005em;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 180ms ease, background 180ms ease;
+    }
+    .cta-primary:hover { transform: translateY(-1px); background: #2D251C; }
+    .cta-primary .arrow { transition: transform 180ms ease; }
+    .cta-primary:hover .arrow { transform: translateY(2px); }
+    .cta-secondary {
+      color: #6B5F4F;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      border-bottom: 1px solid rgba(107, 95, 79, 0.35);
+      padding-bottom: 2px;
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      letter-spacing: 2.5px;
+      font-weight: 700;
+      color: rgba(40, 32, 26, 0.30);
+      text-transform: uppercase;
+      animation: scrollNudge 2.4s ease-in-out infinite;
+    }
+    @keyframes scrollNudge {
+      0%, 100% { transform: translate(-50%, 0); opacity: 0.55; }
+      50%      { transform: translate(-50%, 6px); opacity: 1; }
+    }
+
+    /* === ABOUT ============================================ */
+    .about {
+      padding: 140px 40px 120px;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .kicker {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      color: #8C7B62;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .about p {
+      font-size: 22px;
+      line-height: 1.5;
+      color: #28201A;
+      margin: 0 0 22px;
+      font-weight: 400;
+      letter-spacing: -0.005em;
+    }
+    .about p.quiet { color: #4D4138; }
+
+    /* === IFRAMES (existing) =============================== */
     iframe {
       display: block;
       width: 100%;
       border: 0;
       background: #F0EEE9;
     }
-    /* Subtle divider between the two explorations */
     .divider {
       height: 1px;
       background: rgba(40, 32, 26, 0.08);
       margin: 0 auto;
       max-width: 1400px;
     }
+
+    /* === FOOTER =========================================== */
+    .footer {
+      padding: 100px 40px 72px;
+      text-align: center;
+      color: #8C7B62;
+      font-size: 13px;
+      letter-spacing: 0.01em;
+    }
+    .footer a {
+      color: #28201A;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(40, 32, 26, 0.2);
+      padding-bottom: 1px;
+    }
+    .footer .sep {
+      margin: 0 12px;
+      color: rgba(40, 32, 26, 0.25);
+    }
+
+    /* === MOBILE =========================================== */
+    @media (max-width: 720px) {
+      .hero { padding: 40px 24px 100px; }
+      .hero-sky { top: 28px; right: 28px; width: 84px; height: 84px; }
+      .headline { font-size: 28px; margin: 28px 0 4px; max-width: none; }
+      .ctas { gap: 20px; margin-top: 32px; }
+      .cta-primary { padding: 12px 22px; font-size: 14px; }
+      .about { padding: 96px 24px 80px; }
+      .about p { font-size: 18px; }
+      .footer { padding: 72px 24px 56px; }
+    }
+
+    /* Respect reduced-motion */
+    @media (prefers-reduced-motion: reduce) {
+      .orb, .scroll-hint { animation: none; }
+    }
   </style>
 </head>
+
 <body>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="hero-sky">
+      <div class="orb" id="orb" aria-hidden="true"></div>
+    </div>
+
+    <h1 class="wordmark">Ombri</h1>
+
+    <p class="headline">Finance by the hour.</p>
+    <p class="time-label" id="timeLabel">Morning</p>
+
+    <div class="ctas">
+      <a href="#about" class="cta-primary">See how it feels <span class="arrow" aria-hidden="true">↓</span></a>
+      <span class="cta-secondary">Soon on the App Store</span>
+    </div>
+
+    <div class="scroll-hint">scroll</div>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section class="about" id="about">
+    <p class="kicker">About Ombri</p>
+    <p>Most finance apps treat money like an emergency. Ombri doesn&rsquo;t.</p>
+    <p class="quiet">The interface takes on the color of the hour and the weather outside your window &mdash; morning warmth, afternoon clarity, evening quiet, a different quality of light when it rains. Every number is still there. It just stops yelling.</p>
+  </section>
+
+  <!-- ============ MOCKUPS ============ -->
   <iframe id="f1" src="home-redesign.html" title="Home redesign — time of day" scrolling="no"></iframe>
   <div class="divider"></div>
   <iframe id="f2" src="home-weather.html" title="Home redesign — weather" scrolling="no"></iframe>
 
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    Made by <a href="https://github.com/arttiongson">Art Tiongson</a>
+    <span class="sep">·</span>
+    <a href="https://github.com/arttiongson/Ombri">Source on GitHub</a>
+  </footer>
+
   <script>
-    // Auto-size each iframe to its content so the page scrolls as one continuous canvas.
+    // ===================================================================
+    // Time-of-day orb — picks sun/moon palette from visitor's local hour.
+    // Colors tuned for the cream canvas (#F0EEE9), not for a dark sky.
+    // ===================================================================
+    const palettes = {
+      morning:   {                                 // 5am – 11am
+        highlight: '#FFE9C9', core: '#F2A35A', edge: '#C66328',
+        glow: 'rgba(242, 163, 90, 0.45)', label: 'Morning',
+      },
+      afternoon: {                                 // 11am – 5pm
+        highlight: '#FFF5D2', core: '#F0C04A', edge: '#B88830',
+        glow: 'rgba(240, 192, 74, 0.38)', label: 'Afternoon',
+      },
+      evening:   {                                 // 5pm – 9pm
+        highlight: '#FFD5A5', core: '#D0663A', edge: '#6F2E1C',
+        glow: 'rgba(208, 102, 58, 0.48)', label: 'Evening',
+      },
+      night:     {                                 // 9pm – 5am
+        highlight: '#FFFFFF', core: '#DFE5F2', edge: '#6F7F9C',
+        glow: 'rgba(130, 148, 190, 0.45)', label: 'Night',
+      },
+    };
+    function paletteForHour(h) {
+      if (h >=  5 && h < 11) return palettes.morning;
+      if (h >= 11 && h < 17) return palettes.afternoon;
+      if (h >= 17 && h < 21) return palettes.evening;
+      return palettes.night;
+    }
+
+    const now = new Date();
+    const p = paletteForHour(now.getHours());
+    const orb = document.getElementById('orb');
+    orb.style.setProperty('--orb-highlight', p.highlight);
+    orb.style.setProperty('--orb-core',      p.core);
+    orb.style.setProperty('--orb-edge',      p.edge);
+    orb.style.setProperty('--orb-glow',      p.glow);
+
+    // Time label: "Morning · Los Angeles" (or just "Morning" if tz unknown)
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      const place = (tz.split('/').pop() || '').replace(/_/g, ' ');
+      document.getElementById('timeLabel').textContent =
+        place ? `${p.label} · ${place}` : p.label;
+    } catch (_) {
+      document.getElementById('timeLabel').textContent = p.label;
+    }
+
+    // ===================================================================
+    // Iframe auto-sizing — unchanged from v1, still needed for the mockups.
+    // ===================================================================
     function resize(f) {
       try {
         const doc = f.contentDocument || f.contentWindow.document;
@@ -48,27 +318,21 @@
           doc.body ? doc.body.scrollHeight : 0
         );
         f.style.height = h + 'px';
-      } catch (e) { /* cross-origin — shouldn't happen for same-origin files */ }
+      } catch (e) { /* cross-origin — shouldn't happen */ }
     }
-
     document.querySelectorAll('iframe').forEach((f) => {
       f.addEventListener('load', () => {
         resize(f);
-        // Re-measure after webfonts settle + any late layout shifts.
         [200, 600, 1400, 3000].forEach((t) => setTimeout(() => resize(f), t));
-
         try {
           const doc = f.contentDocument;
           new ResizeObserver(() => resize(f)).observe(doc.documentElement);
-          // Also watch DOM mutations (the mockup cycles through time-of-day states).
           new MutationObserver(() => resize(f)).observe(doc.documentElement, {
             subtree: true, childList: true, attributes: true,
           });
         } catch (e) {}
       });
     });
-
-    // Re-measure on viewport resize.
     window.addEventListener('resize', () => {
       document.querySelectorAll('iframe').forEach(resize);
     });
