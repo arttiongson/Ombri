@@ -201,6 +201,42 @@
       padding-bottom: 2px;
       transition: color 400ms ease, border-color 400ms ease;
     }
+    /* Beta pill — live, pre-release CTA. Sits between the primary button
+       and the "Soon on the App Store" label, signaling "available NOW". */
+    .cta-beta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+      color: var(--sky-text);
+      background: color-mix(in srgb, var(--sky-text) 14%, transparent);
+      border: 1px solid color-mix(in srgb, var(--sky-text) 32%, transparent);
+      text-decoration: none;
+      font-family: inherit;
+      transition: background 180ms ease, transform 180ms ease, color 400ms ease, border-color 400ms ease;
+      position: relative;
+    }
+    .cta-beta::before {
+      content: '';
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #48D18E;
+      box-shadow: 0 0 10px #48D18E;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .cta-beta:hover {
+      background: color-mix(in srgb, var(--sky-text) 22%, transparent);
+      transform: translateY(-1px);
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1;   transform: scale(1);    }
+      50%      { opacity: 0.55; transform: scale(0.85); }
+    }
 
     .orb {
       width: clamp(150px, 18vw, 220px);
@@ -325,6 +361,50 @@
       background: transparent;
     }
 
+    /* ================= FEATURES (snap 3) ================= */
+    /* Mirror of .about-grid — phones on the LEFT this time, copy on the right.
+       Shows afternoon + sunset to round out the time-of-day variety. */
+    .features-grid {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(440px, 3fr) minmax(300px, 2fr);
+      align-items: center;
+      gap: 72px;
+      padding: 72px 64px;
+      max-width: 1600px;
+      margin: 0 auto;
+      color: var(--cream-text);
+    }
+    .features-text .kicker {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 2.5px; text-transform: uppercase;
+      color: #8C7B62; margin: 0 0 26px;
+    }
+    .features-text h3 {
+      font-size: clamp(18px, 1.5vw, 20px);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin: 0 0 6px;
+      color: var(--cream-text);
+    }
+    .features-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .features-list li {
+      margin: 0 0 28px;
+      padding-left: 0;
+    }
+    .features-list li:last-child { margin-bottom: 0; }
+    .features-list p {
+      font-size: 16px;
+      line-height: 1.5;
+      color: #4D4138;
+      margin: 0;
+      max-width: 520px;
+    }
+
     /* ================= FREE-SCROLL MOCKUP GALLERIES ================= */
     .mockup-gallery {
       background: var(--cream);
@@ -351,6 +431,76 @@
       border: 0;
       background: var(--cream);
     }
+    /* "Coming Soon" pill next to a gallery title, and dim the preview
+       below to signal that what's shown is a preview, not a feature yet. */
+    .cs-pill {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 14px;
+      vertical-align: 3px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+      padding: 5px 11px 4px;
+      border-radius: 999px;
+      background: rgba(40, 32, 26, 0.08);
+      color: #6B5F4F;
+      border: 1px solid rgba(40, 32, 26, 0.10);
+    }
+    .mockup-gallery.coming-soon iframe {
+      opacity: 0.72;
+      transition: opacity 300ms ease;
+    }
+
+    /* ================= BETA / TESTFLIGHT (bottom) ================= */
+    .beta-test {
+      padding: 140px 40px 120px;
+      background: var(--cream);
+      text-align: center;
+    }
+    .beta-inner {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .beta-inner .kicker {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 2.5px; text-transform: uppercase;
+      color: #8C7B62; margin: 0 0 18px;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .beta-inner .kicker::before {
+      content: '';
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #48D18E;
+      box-shadow: 0 0 10px rgba(72, 209, 142, 0.6);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .beta-inner h2 {
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      line-height: 1.1;
+      margin: 0 0 18px;
+      color: #1F1A14;
+    }
+    .beta-inner > p {
+      font-size: 18px;
+      color: #4D4138;
+      line-height: 1.5;
+      margin: 0 0 36px;
+    }
+    .beta-inner .cta-primary {
+      background: #1F1A14;
+      color: var(--cream);
+    }
+    .beta-inner .cta-note {
+      display: block;
+      margin-top: 20px;
+      font-size: 13px;
+      color: #8C7B62;
+    }
 
     /* ================= FOOTER ================= */
     .footer {
@@ -368,12 +518,17 @@
 
     /* ================= MOBILE / TABLET ================= */
     @media (max-width: 900px) {
-      /* Stack about-grid vertically */
-      .about-grid {
+      /* Stack both split sections vertically. For features: put copy on top
+         so the feature list reads first, then the phones preview. */
+      .about-grid,
+      .features-grid {
         grid-template-columns: 1fr;
         gap: 40px;
         padding: 72px 24px;
       }
+      .features-grid { grid-template-areas: "copy" "phones"; }
+      .features-grid .features-text  { grid-area: copy;   }
+      .features-grid .phones-window  { grid-area: phones; }
       .phones-window { height: 380px; }
     }
     @media (max-width: 720px) {
@@ -427,6 +582,7 @@
         <p class="time-label" id="timeLabel">Morning</p>
         <div class="ctas">
           <a href="#about" class="cta-primary">See how it feels <span class="arrow" aria-hidden="true">↓</span></a>
+          <a href="#beta"  class="cta-beta">Beta Test Now</a>
           <span class="cta-secondary">Soon on the App Store</span>
         </div>
       </div>
@@ -455,6 +611,37 @@
     </div>
   </section>
 
+  <!-- ========== SNAP 3: FEATURES (phones LEFT, copy RIGHT) ========== -->
+  <section class="features-grid snap" id="features">
+    <div class="phones-window" aria-label="Preview: afternoon and sunset home screens">
+      <iframe id="fFeatures"
+              src="home-redesign.html?bare=1&periods=afternoon,sunset"
+              title="Afternoon and sunset home screens preview"
+              scrolling="no"></iframe>
+    </div>
+    <div class="features-text">
+      <p class="kicker">What Ombri does</p>
+      <ul class="features-list">
+        <li>
+          <h3>Plugs into your bank.</h3>
+          <p>Secure connection through Plaid. Accounts, cards, and investments arrive already categorized.</p>
+        </li>
+        <li>
+          <h3>Finds your bills.</h3>
+          <p>Recurring charges surface themselves — rent, subscriptions, utilities, anything with a pattern.</p>
+        </li>
+        <li>
+          <h3>Tracks every payment.</h3>
+          <p>Every transaction, searchable by amount, merchant, category, or date.</p>
+        </li>
+        <li>
+          <h3>Tells you before you overspend.</h3>
+          <p>A gentle notification when a category&rsquo;s trending hot. Never an alarm.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
   <!-- ========== FREE SCROLL: FULL GALLERIES ========== -->
   <section class="mockup-gallery">
     <div class="gallery-title">
@@ -464,12 +651,25 @@
     <iframe id="fRedesign" src="home-redesign.html?bare=1" title="All four time-of-day home screens" scrolling="no"></iframe>
   </section>
 
-  <section class="mockup-gallery">
+  <section class="mockup-gallery coming-soon">
     <div class="gallery-title">
-      <h2>And when the sky changes</h2>
-      <p>Clear, cloudy, rain, snow, lightning. The surface responds to the weather outside.</p>
+      <h2>And when the sky changes <span class="cs-pill">Coming Soon</span></h2>
+      <p>A preview of where Ombri is headed. Clear, cloudy, rain, snow, lightning &mdash; the surface will respond to the weather outside your window.</p>
     </div>
-    <iframe id="fWeather" src="home-weather.html?bare=1" title="Weather variants" scrolling="no"></iframe>
+    <iframe id="fWeather" src="home-weather.html?bare=1" title="Weather variants preview" scrolling="no"></iframe>
+  </section>
+
+  <!-- ========== BETA / TESTFLIGHT ========== -->
+  <section class="beta-test" id="beta">
+    <div class="beta-inner">
+      <p class="kicker">Beta · Live now</p>
+      <h2>Ombri is open for TestFlight.</h2>
+      <p>Try the pre-release build before the App Store launch. Your transactions stay on your device; feedback goes straight back to the team.</p>
+      <a class="cta-primary" href="https://testflight.apple.com/join/PLACEHOLDER" target="_blank" rel="noopener">
+        Open TestFlight invite <span aria-hidden="true">↗</span>
+      </a>
+      <span class="cta-note">Requires iOS 17 or later · TestFlight app free from the App Store</span>
+    </div>
   </section>
 
   <footer class="footer">
@@ -752,17 +952,31 @@
       }, { passive: true });
 
       // ---- CTA smooth-scroll into snap 2 ----
-      document.querySelector('.cta-primary')?.addEventListener('click', (e) => {
+      document.querySelector('.hero .cta-primary')?.addEventListener('click', (e) => {
         e.preventDefault();
         snapTo(1);
+      });
+      // ---- Beta pill: skip the snap zone entirely, scroll to #beta ----
+      document.querySelector('.cta-beta')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        const beta = document.getElementById('beta');
+        if (!beta) return;
+        isAnimating = true;
+        window.scrollTo({ top: beta.offsetTop, behavior: 'smooth' });
+        clearTimeout(animTimer);
+        animTimer = setTimeout(() => { isAnimating = false; }, 1200);
       });
     })();
 
     // Mobile CTA fallback (no fullpage controller installed)
     if (window.matchMedia('(max-width: 720px)').matches) {
-      document.querySelector('.cta-primary')?.addEventListener('click', (e) => {
+      document.querySelector('.hero .cta-primary')?.addEventListener('click', (e) => {
         e.preventDefault();
         document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
+      });
+      document.querySelector('.cta-beta')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('beta').scrollIntoView({ behavior: 'smooth' });
       });
     }
 
