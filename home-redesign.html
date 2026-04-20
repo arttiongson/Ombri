@@ -38,9 +38,16 @@
     display: grid; grid-template-columns: repeat(2, auto);
     gap: 48px; justify-content: center; align-items: start;
   }
+  /* Embedded in narrow containers (iframe pane): scale the 2-column grid down
+     so both phones stay visible instead of clipping on the right. */
+  @media (max-width: 900px) { body { zoom: 0.90; } }
+  @media (max-width: 840px) { body { zoom: 0.85; } }
+  @media (max-width: 760px) { body { zoom: 0.80; } }
+  /* True mobile: switch to single-column stack */
   @media (max-width: 720px) {
     .canvas-wrap { padding: 32px 16px 64px; }
     .frames { grid-template-columns: 1fr; gap: 36px; }
+    body { zoom: 1; } /* stacked, no need to scale */
   }
   .frame-cell {
     display: flex; flex-direction: column; align-items: center;
@@ -1028,7 +1035,14 @@ const APP_TWEAKS = /*EDITMODE-BEGIN*/{
   "showLabels": true
 }/*EDITMODE-END*/;
 
-const periods = ['morning', 'afternoon', 'sunset', 'night'];
+const ALL_PERIODS = ['morning', 'afternoon', 'sunset', 'night'];
+const _periodsParam = (() => {
+  try { return new URL(location.href).searchParams.get('periods'); }
+  catch (_) { return null; }
+})();
+const periods = _periodsParam
+  ? _periodsParam.split(',').map(s => s.trim()).filter(p => ALL_PERIODS.includes(p))
+  : ALL_PERIODS;
 const labels = {
   morning:   { name: 'MORNING',   sub: '6–11 am · sun right, content left' },
   afternoon: { name: 'AFTERNOON', sub: '11 am–5 pm · sun overhead, centered' },
