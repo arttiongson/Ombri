@@ -116,13 +116,24 @@
       display: flex; align-items: center; justify-content: center;
       position: relative;
     }
+    /* Celestial wrap — a sized box exactly around the orb. Both the orb
+       and the moon halo are positioned inside it, so the halo always
+       centers on the orb regardless of the surrounding flex layout
+       (important on mobile where the hero-right is full-width but the
+       orb sits at flex-start, not centered). */
+    .celestial-wrap {
+      position: relative;
+      width: clamp(150px, 18vw, 220px);
+      aspect-ratio: 1;
+      display: block;
+    }
     /* Moon halo — a separate circular gradient behind the orb so the glow
        reads as a clean ring even though the moon itself is a crescent
        (drop-shadow on a masked element follows the crescent outline instead
        of the implied full-disc). Visible only at night. */
     .moon-halo {
       position: absolute;
-      width: clamp(300px, 34vw, 440px);
+      width: clamp(280px, 32vw, 420px);
       aspect-ratio: 1;
       border-radius: 50%;
       top: 50%; left: 50%;
@@ -239,8 +250,8 @@
     }
 
     .orb {
-      width: clamp(150px, 18vw, 220px);
-      aspect-ratio: 1;
+      width: 100%;
+      height: 100%;
       border-radius: 50%;
       background: radial-gradient(circle at 32% 32%,
         var(--orb-from) 0%,
@@ -540,12 +551,16 @@
       .hero-left, .hero-right { flex: none; width: 100%; }
       .hero-divider { display: none; }
       .hero-right { justify-content: flex-start; }
-      .orb { width: 112px; }
+      .celestial-wrap { width: 112px; }
+      .moon-halo { width: 240px; }
       .headline { font-size: 28px; margin: 28px 0 8px; }
       .ctas { gap: 20px; margin-top: 28px; }
       .cta-primary { padding: 12px 22px; font-size: 14px; }
-      .about-grid { padding: 64px 24px; }
-      .phones-window { height: 340px; }
+      .about-grid,
+      .features-grid { padding: 64px 24px; }
+      /* Hide the cropped phone preview on mobile — the full galleries below
+         show the phones at 1:1 so the preview is redundant. */
+      .phones-window { display: none; }
       .dev-controls {
         top: 12px; right: 12px; bottom: auto;
         font-size: 10px;
@@ -589,8 +604,10 @@
       <div class="hero-divider" aria-hidden="true"></div>
       <div class="hero-right">
         <div class="horizon" aria-hidden="true"></div>
-        <div class="moon-halo" aria-hidden="true"></div>
-        <div class="orb" id="orb" aria-hidden="true"></div>
+        <div class="celestial-wrap" aria-hidden="true">
+          <div class="moon-halo"></div>
+          <div class="orb" id="orb"></div>
+        </div>
       </div>
     </div>
     <div class="scroll-hint">scroll</div>
@@ -673,9 +690,9 @@
   </section>
 
   <footer class="footer">
-    Made by <a href="https://github.com/arttiongson">Art Tiongson</a>
+    Made by <a href="https://github.com/arttiongson" target="_blank" rel="noopener">Art Tiongson</a>
     <span class="sep">·</span>
-    <a href="https://github.com/arttiongson/Ombri">Source on GitHub</a>
+    <a href="https://github.com/arttiongson/Ombri" target="_blank" rel="noopener">Source on GitHub</a>
   </footer>
 
   <script>
