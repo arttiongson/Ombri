@@ -194,9 +194,12 @@
       position: relative;
       z-index: 2;
     }
-    /* Sunset: half-sun. The bottom half is "below the horizon". */
+    /* Sunset: half-sun sitting on the horizon.
+       Using mask-image (not clip-path) so the circular border-radius still
+       defines the visible shape — clip-path would clip to a rectangle. */
     body.period-sunset .orb {
-      clip-path: inset(0 0 50% 0);
+      -webkit-mask-image: linear-gradient(to bottom, #000 50%, transparent 50.1%);
+              mask-image: linear-gradient(to bottom, #000 50%, transparent 50.1%);
     }
     /* Night: crescent moon with a luminous multi-stop halo. */
     body.period-night .orb {
