@@ -42,18 +42,58 @@
     .canvas-wrap { padding: 32px 16px 64px; }
     .frames { grid-template-columns: 1fr; gap: 36px; }
   }
-  .frame-cell { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .frame-cell {
+    display: flex; flex-direction: column; align-items: center;
+    position: relative; /* anchor for overlaid caption pill */
+  }
+  /* Caption pill overlaid on top of each phone screen, so the label stays
+     visible whether the grid is zoomed in (only top half of phone visible)
+     or fully zoomed out. */
   .frame-label {
-    font-size: 11px; font-weight: 700; letter-spacing: 2px;
-    color: #8C7B62; text-transform: uppercase;
+    position: absolute;
+    top: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 6px 14px 5px;
+    border-radius: 999px;
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    color: rgba(242, 239, 230, 0.95);
+    text-transform: uppercase;
+    white-space: nowrap;
+    pointer-events: none;
   }
   .frame-time {
-    font-size: 12px; color: rgba(40,30,20,0.5);
-    margin-top: -14px;
+    position: absolute;
+    top: 56px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    font-size: 10px;
+    color: rgba(242, 239, 230, 0.55);
+    letter-spacing: 0.3px;
+    margin-top: 0;
+    white-space: nowrap;
+    pointer-events: none;
   }
+  /* Bare mode (iframe with ?bare=1): hide the gallery-level canvas header
+     so the wrapper's scroll-zoom effect can target phones directly. */
+  .bare .canvas-header { display: none; }
+  .bare .canvas-wrap { padding-top: 24px; }
 </style>
 </head>
 <body>
+<script>
+  // Toggle bare mode when iframed with ?bare=1 (hides gallery header)
+  try {
+    if (new URL(location.href).searchParams.has('bare')) {
+      document.documentElement.classList.add('bare');
+    }
+  } catch (_) {}
+</script>
 <div id="root"></div>
 
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
