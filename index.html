@@ -555,11 +555,10 @@
       .headline { font-size: 28px; margin: 28px 0 8px; }
       .ctas { gap: 20px; margin-top: 28px; }
       .cta-primary { padding: 12px 22px; font-size: 14px; }
-      /* Mobile layout: hide the cropped phone preview AND the full
-         galleries entirely — mobile keeps just the hero + text sections +
-         beta CTA for a tight, focused flow. */
+      /* Mobile: hide only the cropped phone previews in About/Features —
+         the full galleries below still render (phones stack single-column
+         per the mockup's internal mobile media queries). */
       .phones-window { display: none; }
-      .mockup-gallery { display: none; }
       /* Text sections stop forcing 100vh and collapse to their content so
          there's no empty space between paragraphs. */
       .about-grid,
