@@ -885,135 +885,22 @@
     updateFade();
 
     // =============================================================
-    // Fullpage.js-style controller
-    //   · Intercepts wheel / touch / keyboard inside the "snap zone"
-    //     (the first N `.snap` sections — currently hero + about-grid)
-    //   · Each gesture = one full-viewport transition via smooth scroll
-    //   · Scrolling PAST the last snap section releases into free scroll
-    //   · Disabled on mobile (<=720px) — native scroll feels better there
+    // Native scroll.
+    //   No fullpage controller, no CSS snap — just smooth native
+    //   scrolling with anchor-link CTAs. Previous snap implementations
+    //   fought MacBook trackpad momentum and felt buggy. Sections still
+    //   use min-height: 100vh, so each reads as a distinct screen while
+    //   the browser handles scroll naturally.
     // =============================================================
-    (function initFullpage() {
-      if (window.matchMedia('(max-width: 720px)').matches) return;
-
-      const snapSections = [...document.querySelectorAll('.snap')];
-      if (snapSections.length < 2) return;
-
-      const getSnapZoneEnd = () => {
-        const last = snapSections[snapSections.length - 1];
-        return last.offsetTop + last.offsetHeight;
-      };
-
-      let currentIndex = 0;
-      let isAnimating = false;
-      let animTimer;
-      const ANIM_LOCK_MS = 850;
-
-      function snapTo(index) {
-        index = Math.max(0, Math.min(snapSections.length - 1, index));
-        currentIndex = index;
-        isAnimating = true;
-        window.scrollTo({ top: snapSections[index].offsetTop, behavior: 'smooth' });
-        clearTimeout(animTimer);
-        animTimer = setTimeout(() => { isAnimating = false; }, ANIM_LOCK_MS);
-      }
-      function unsnapDown() {
-        isAnimating = true;
-        window.scrollTo({ top: getSnapZoneEnd() + 2, behavior: 'smooth' });
-        clearTimeout(animTimer);
-        animTimer = setTimeout(() => { isAnimating = false; }, ANIM_LOCK_MS);
-      }
-
-      // ---- Wheel (mouse + trackpad) ----
-      let wheelAccum = 0;
-      let wheelResetTimer;
-      const WHEEL_TRIGGER = 30;
-      window.addEventListener('wheel', (e) => {
-        const inSnapZone = window.scrollY < getSnapZoneEnd() - 60;
-        if (!inSnapZone) return;
-
-        if (isAnimating) { e.preventDefault(); return; }
+    document.querySelectorAll('a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', (e) => {
+        const id = link.getAttribute('href').slice(1);
+        const target = document.getElementById(id);
+        if (!target) return;
         e.preventDefault();
-
-        wheelAccum += e.deltaY;
-        clearTimeout(wheelResetTimer);
-        wheelResetTimer = setTimeout(() => { wheelAccum = 0; }, 180);
-
-        if (Math.abs(wheelAccum) < WHEEL_TRIGGER) return;
-        const dir = wheelAccum > 0 ? 1 : -1;
-        wheelAccum = 0;
-
-        if (dir > 0 && currentIndex === snapSections.length - 1) unsnapDown();
-        else snapTo(currentIndex + dir);
-      }, { passive: false });
-
-      // ---- Touch ----
-      let touchStartY = 0;
-      window.addEventListener('touchstart', (e) => {
-        touchStartY = e.touches[0].clientY;
-      }, { passive: true });
-      window.addEventListener('touchend', (e) => {
-        if (window.scrollY >= getSnapZoneEnd() - 60) return;
-        if (isAnimating) return;
-        const delta = touchStartY - e.changedTouches[0].clientY;
-        if (Math.abs(delta) < 40) return;
-        const dir = delta > 0 ? 1 : -1;
-        if (dir > 0 && currentIndex === snapSections.length - 1) unsnapDown();
-        else snapTo(currentIndex + dir);
-      }, { passive: true });
-
-      // ---- Keyboard ----
-      window.addEventListener('keydown', (e) => {
-        if (window.scrollY >= getSnapZoneEnd() - 60) return;
-        const down = ['ArrowDown', 'PageDown', ' '].includes(e.key);
-        const up   = ['ArrowUp',   'PageUp'        ].includes(e.key);
-        if (!down && !up) return;
-        e.preventDefault();
-        if (isAnimating) return;
-        if (down) {
-          if (currentIndex === snapSections.length - 1) unsnapDown();
-          else snapTo(currentIndex + 1);
-        } else {
-          snapTo(currentIndex - 1);
-        }
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
-
-      // ---- Passive index sync during natural scroll (e.g. anchor, keyboard) ----
-      window.addEventListener('scroll', () => {
-        if (isAnimating) return;
-        const y = window.scrollY + window.innerHeight / 2;
-        for (let i = snapSections.length - 1; i >= 0; i--) {
-          if (y >= snapSections[i].offsetTop) { currentIndex = i; break; }
-        }
-      }, { passive: true });
-
-      // ---- CTA smooth-scroll into snap 2 ----
-      document.querySelector('.hero .cta-primary')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        snapTo(1);
-      });
-      // ---- Beta pill: skip the snap zone entirely, scroll to #beta ----
-      document.querySelector('.cta-beta')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        const beta = document.getElementById('beta');
-        if (!beta) return;
-        isAnimating = true;
-        window.scrollTo({ top: beta.offsetTop, behavior: 'smooth' });
-        clearTimeout(animTimer);
-        animTimer = setTimeout(() => { isAnimating = false; }, 1200);
-      });
-    })();
-
-    // Mobile CTA fallback (no fullpage controller installed)
-    if (window.matchMedia('(max-width: 720px)').matches) {
-      document.querySelector('.hero .cta-primary')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
-      });
-      document.querySelector('.cta-beta')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.getElementById('beta').scrollIntoView({ behavior: 'smooth' });
-      });
-    }
+    });
 
     // =============================================================
     // Iframe auto-sizing (full-grid galleries size to content)
