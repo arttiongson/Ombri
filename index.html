@@ -109,6 +109,9 @@
       align-items: center;
       padding: 48px 56px;
       gap: 56px;
+      /* Fade with the sky. As bg interpolates to cream, content dissolves
+         so it doesn't float uncolored against the cream bg mid-transition. */
+      opacity: calc(1 - var(--fade, 0));
     }
     .hero-left   { flex: 1 1 62%; min-width: 0; }
     .hero-divider {
@@ -157,7 +160,7 @@
       pointer-events: none;
       z-index: 1;
     }
-    body.period-night .moon-halo { opacity: calc(1 - var(--fade, 0)); }
+    body.period-night .moon-halo { opacity: 1; } /* hero-inner handles scroll fade */
 
     /* Horizon line below the half-sun at sunset. Extends well beyond the
        right panel so it reads as a true horizon, not a decorative underline. */
@@ -176,7 +179,7 @@
       transition: opacity 500ms ease;
       pointer-events: none;
     }
-    body.period-sunset .horizon { opacity: 1; }
+    body.period-sunset .horizon { opacity: calc(1 - var(--fade, 0)); }
     .wordmark {
       font-size: clamp(84px, 18vw, 220px);
       font-weight: 800; font-style: italic;
@@ -333,6 +336,9 @@
       color: color-mix(in srgb, var(--sky-text) 35%, transparent);
       text-transform: uppercase;
       animation: scrollNudge 2.4s ease-in-out infinite;
+      /* filter:opacity (not opacity:) so scrollNudge's own opacity keyframe
+         keeps animating — filter composites on top of the element opacity. */
+      filter: opacity(calc(1 - var(--fade, 0)));
     }
     @keyframes scrollNudge {
       0%, 100% { transform: translate(-50%, 0); opacity: 0.55; }
