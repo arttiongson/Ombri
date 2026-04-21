@@ -39,15 +39,18 @@
     gap: 48px; justify-content: center; align-items: start;
   }
   /* Embedded in narrow containers (iframe pane): scale the 2-column grid down
-     so both phones stay visible instead of clipping on the right. */
+     so both phones stay visible instead of clipping on the right. Extended
+     down to 620px so the 2-col grid survives in narrow preview panes. */
   @media (max-width: 900px) { body { zoom: 0.90; } }
   @media (max-width: 840px) { body { zoom: 0.85; } }
   @media (max-width: 760px) { body { zoom: 0.80; } }
-  /* True mobile: switch to single-column stack */
-  @media (max-width: 720px) {
+  @media (max-width: 680px) { body { zoom: 0.75; } }
+  @media (max-width: 620px) { body { zoom: 0.70; } }
+  /* Below 560 — true mobile — stack to single column. */
+  @media (max-width: 560px) {
     .canvas-wrap { padding: 32px 16px 64px; }
     .frames { grid-template-columns: 1fr; gap: 36px; }
-    body { zoom: 1; } /* stacked, no need to scale */
+    body { zoom: 1; }
   }
   .frame-cell {
     display: flex; flex-direction: column; align-items: center;
